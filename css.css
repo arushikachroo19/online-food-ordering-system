@@ -1,0 +1,458 @@
+* {box-sizing: border-box}
+
+/* style the container */
+.container {
+  position: relative;
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px 0 30px 0;
+} 
+
+/* style inputs and link buttons */
+input,
+.btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 4px;
+  margin: 5px 0;
+  opacity: 0.85;
+  display: inline-block;
+  font-size: 17px;
+  line-height: 20px;
+  text-decoration: none; /* remove underline from anchors */
+}
+
+input:hover,
+.btn:hover {
+  opacity: 1;
+}
+
+/* add appropriate colors to fb, twitter and google buttons */
+.fb {
+  background-color: #3B5998;
+  color: white;
+}
+
+.twitter {
+  background-color: #55ACEE;
+  color: white;
+}
+
+.google {
+  background-color: #dd4b39;
+  color: white;
+}
+
+/* style the submit button */
+input[type=submit] {
+  background-color: #3B5998;
+  color: white;
+  cursor: pointer;
+}
+
+input[type=submit]:hover {
+  background-color: #45a049;
+}
+
+/* Two-column layout */
+.col {
+  float: left;
+  width: 100%;
+  margin: auto;
+  padding: 0 10px;
+  margin-top: 6px;
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+
+/* vertical line */
+.vl {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%);
+  border: 2px solid #ddd;
+  height: 175px;
+}
+
+/* text inside the vertical line */
+.inner {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 50%;
+  padding: 8px 10px;
+}
+
+/* hide some text on medium and large screens */
+.hide-md-lg {
+  display: none;
+}
+
+/* bottom container */
+.bottom-container {
+  text-align: center;
+  background-color: #666;
+  border-radius: 0px 0px 4px 4px;
+}
+
+/* Responsive layout - when the screen is less than 650px wide, make the two columns stack on top of each other instead of next to each other */
+@media screen and (max-width: 650px) {
+  .col {
+    width: 50%;
+    margin-top: 0;
+  }
+  /* hide the vertical line */
+  .vl {
+    display: none;
+  }
+  /* show the hidden text on small screens */
+  .hide-md-lg {
+    display: block;
+    text-align: center;
+  }
+}
+
+  table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+td, th {
+  border: 1px solid #dddddd;
+  text-align: left;
+  padding: 8px;
+}
+
+tr:nth-child(even) {
+  background-color: #dddddd;
+}
+
+
+ 
+
+ <div class="col <?php echo (!empty($rno_err)) ? 'has-error' : ''; ?>">
+                <label>Enter rollno </label>
+                <input type="text" name="rno"  class="form-control" value="<?php echo $rno; ?>">
+                <span class="help-block"><?php echo $rno_err; ?></span>
+            </div>
+
+ <div class="col <?php echo (!empty($marks_err)) ? 'has-error' : ''; ?>">
+                <label>Enter marks </label>
+                <input type="text" name="marks"  class="form-control" value="<?php echo $marks; ?>">
+                <span class="help-block"><?php echo $marks_err; ?></span>
+            </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php
+// Initialize the session
+session_start();
+ require_once "config.php";
+ ?>
+
+ <?php
+// Check if the user is logged in, if not then redirect him to login page
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+   header("location: login.php");
+
+    exit;
+}
+?>
+
+
+
+<?php
+// define variables and set to empty values
+$sem = $cou = $sub = $rno = $marks = "";
+// Define variables and initialize with empty values
+
+$rno_err = $marks_err =  "";
+ 
+// Check if rno is empty
+//    if(empty(trim($_POST["rno"]))){
+  //      $rno_err = "Please enter rollno.";
+    //} else{
+      //  $rno = trim($_POST["rno"]);
+    //}
+  
+// Check if marks is empty
+//    if(empty(trim($_POST["marks"]))){
+  //      $marks_err = "Please enter marks.";
+    //} else{
+      //  $marks = trim($_POST["marks"]);
+    //}
+
+
+
+//check rollnumber already taken
+// Processing form data when form is submitted
+if($_SERVER["REQUEST_METHOD"] == "POST"){
+ 
+// Check if marks is empty
+    if(empty(trim($_POST["marks"]))){
+        $marks_err = "Please enter marks .";
+    } else{
+        $marks = trim($_POST["marks"]);
+    }
+    // Validate rollno
+    if(empty(trim($_POST["rno"]))){
+        $rno_err = "Please enter a rollno.";
+    } else{
+        // Prepare a select statement
+        $sql = "SELECT rno FROM record WHERE rno = ?";
+
+if($stmt = mysqli_prepare($link, $sql)){
+            // Bind variables to the prepared statement as parameters
+            mysqli_stmt_bind_param($stmt, "s", $param_rno);
+            
+            // Set parameters
+            $param_rno = trim($_POST["rno"]);
+        
+
+if(mysqli_stmt_execute($stmt)){
+                /* store result */
+                mysqli_stmt_store_result($stmt);
+            
+if(mysqli_stmt_num_rows($stmt) == 1){
+  $rno_err = "This rollno is already taken.";
+  } else{
+$rno = trim($_POST["rno"]);
+} 
+}}}}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $sem = test_input($_POST["sem"]);
+  $cou = test_input($_POST["cou"]);
+  $sub = test_input($_POST["sub"]);
+  $rno = test_input($_POST["rno"]);
+  $marks = test_input($_POST["marks"]);
+}
+
+function test_input($data) {
+  $data = trim($data);
+  $data = stripslashes($data);
+  $data = htmlspecialchars($data);
+  return $data;
+}
+
+
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<?php  
+//$link = mysqli_connect("localhost", "root", "", "newdb"); 
+  
+if ($link === false) { 
+    die("ERROR: Could not connect. ".mysqli_connect_error()); 
+} 
+  
+$sql = "INSERT INTO record (sem, cou, sub, rno, marks)  
+          VALUES('$sem', '$cou', '$sub', '$rno', '$marks') "; 
+    if (mysqli_query($link, $sql))
+{ 
+    //echo "Records inserted successfully.";
+    echo "<script type='text/javascript'>alert('submitted successfully!')</script>";
+                // Redirect to login page
+                header("location: student.php");
+}   else
+{ 
+    //echo "ERROR: Could not able to execute $sql. "
+      //  .mysqli_error($link); 
+}
+  
+mysqli_close($link); 
+
+?>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>sallabus</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <link rel="stylesheet" href="css.css">
+
+
+    <style type="text/css">
+        body{ font: 14px sans-serif; }
+        .wrapper{ width: 450px; padding: 20px; }
+    </style>
+
+    <style type="text/css">
+        body{ font: 14px sans-serif; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1><p><label>Hello, <b><?php echo htmlspecialchars($_SESSION["username"]); ?></b>. Welcome to science college greading system.</h1>
+
+    </div>
+    
+
+
+
+
+
+<?php
+ // echo "Records inserted successfully.";
+//echo $sem; echo "    "; 
+//echo $cou; echo "    "; 
+//echo $sub; echo "    ";
+//echo $rno; echo "    "; 
+//echo $marks; echo "    ";  
+ 	
+?>
+</body>
+
+
+
+
+
+
+
+<center>
+<div class="wrapper">
+<p><label>Please fill the form to submit student record in the database  .</label></p>
+
+
+<form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+<table >
+<td colspan="0" width="230">
+<table  >
+<td colspan="0">
+
+<div class="col">
+  <label>Select sem :  </label>
+  <select name = "sem" class="form-control" value="<?php echo $sem; ?>">
+  <option value="semII">semester II     </option>
+  <option value="semIV">semester IV     </option>
+  <option value="semVII">semester VII     </option>
+  </select>
+  </div>
+
+  <div class="col">
+<label>select sub : </label>
+<select name = "sub" class="form-control" value="<?php echo $sub; ?>">
+  <option value="clang">c langauge</option>
+  <option value="cpp">c++ language</option>
+  <option value="datastructure">datstructure</option>
+  <option value="dbms">DBMS</option>
+<option value="digitalsolution">Digital solutions</option>
+<option value="softwareengineering">software engineering</option>
+<option value="operatingsystem">operating system</option>
+<option value="systemanalysesdesigning">SAD</option>
+<option value="projectwork">project work</option>
+
+</select>    
+       </div>
+
+<div class="col">
+<p><label>Select your course :</label>
+    <select name = "cou" class="form-control" value="<?php echo $cou; ?>">
+  <option value="bca">BCA</option>
+  <option value="computerscience">computer science</option>
+</select></div>
+
+
+
+
+
+<div class="col">
+                <input type="submit" class=""  value="submit">
+
+                <input type="reset" class="" value="Reset">
+
+            </div>
+</form>
+  </div>
+
+    </p>
+
+                </td>
+                </table>
+                </td>
+
+                </table>
+                    </style>
+
+
+
+
